@@ -1,0 +1,235 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.0.js" integrity="sha256-r/AaFHrszJtwpe+tHyNi/XCfMxYpbsRg2Uqn0x3s2zc=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+<body>
+<button class="btn btn-primary" id="btn" > <b>START ENGINES</b></button> 
+<canvas id="myCanvas"></canvas>
+</body>
+
+<script>
+    let app = new PIXI.Application({
+        view: myCanvas,
+        width:1100,
+        height:1000,
+        antialias: true,   
+        transparent: true, 
+        resolution: 1  ,
+        autoResize: true,
+        resolution: devicePixelRatio 
+        
+    });
+    let Application = PIXI.Application,
+    Container = PIXI.Container,
+    loader = PIXI.loader,
+    resources = PIXI.loader.resources,
+    TextureCache = PIXI.utils.TextureCache,
+    Sprite = PIXI.Sprite,
+    Rectangle = PIXI.Rectangle;
+    PIXI.loader.add([
+        "images/rocket.png",
+        "images/rocket_bottom.png",
+        "images/thrust.png",
+        "images/rocket_top.png",
+    ]).load(setup)
+    function setup() {
+    rocketTop1= new PIXI.Sprite(PIXI.loader.resources["images/rocket_top.png"].texture);
+    bottom1 = new PIXI.Sprite(PIXI.loader.resources['images/rocket_bottom.png'].texture);;
+    thrust1 = new PIXI.Sprite(PIXI.loader.resources["images/thrust.png"].texture);
+    rocketTop2= new PIXI.Sprite(PIXI.loader.resources["images/rocket_top.png"].texture);
+    bottom2 = new PIXI.Sprite(PIXI.loader.resources['images/rocket_bottom.png'].texture);
+    thrust2 = new PIXI.Sprite(PIXI.loader.resources["images/thrust.png"].texture);
+    rocketTop3= new PIXI.Sprite(PIXI.loader.resources["images/rocket_top.png"].texture);
+    bottom3 = new PIXI.Sprite(PIXI.loader.resources['images/rocket_bottom.png'].texture);
+    thrust3 = new PIXI.Sprite(PIXI.loader.resources["images/thrust.png"].texture);
+    thrust2stage = new PIXI.Sprite(PIXI.loader.resources["images/thrust.png"].texture);
+    rocketTop4= new PIXI.Sprite(PIXI.loader.resources["images/rocket_top.png"].texture);
+    bottom4 = new PIXI.Sprite(PIXI.loader.resources['images/rocket_bottom.png'].texture);
+    thrust4 = new PIXI.Sprite(PIXI.loader.resources["images/thrust.png"].texture);
+    app.stage.addChild(rocketTop1);
+    app.stage.addChild(bottom1);
+    app.stage.addChild(thrust1);
+    app.stage.addChild(rocketTop2);
+    app.stage.addChild(bottom2);
+    app.stage.addChild(thrust2);
+    app.stage.addChild(rocketTop3);
+    app.stage.addChild(bottom3);
+    app.stage.addChild(thrust3);
+    app.stage.addChild(thrust2stage);
+    app.stage.addChild(rocketTop4);
+    app.stage.addChild(bottom4);
+    app.stage.addChild(thrust4);
+        ////Rocket 1 /////        
+        rocketTop1.x = app.screen.width/4;
+        rocketTop1.y = app.screen.height /1.13;
+        rocketTop1.interactive = true;
+        rocketTop1.buttonMode =true;
+        bottom1.x = app.screen.width /4;
+        bottom1.y = app.screen.height/1.05;
+        thrust1.x = app.screen.width/3.85;
+        thrust1.y = app.screen.height /1.02;
+        thrust2stage.visible = false;
+        thrust1.visible = false;
+        ////Rocket 2 /////        
+        rocketTop2.x = app.screen.width/2.5;
+        rocketTop2.y = app.screen.height /1.13;
+        rocketTop2.interactive = true;
+        rocketTop2.buttonMode =true;
+        bottom2.x = app.screen.width /2.5;
+        bottom2.y = app.screen.height/1.05;
+        thrust2.x = app.screen.width/2.43;
+        thrust2.y = app.screen.height / 1.02;
+        thrust2.visible =false;
+        ////Rocket 3 /////        
+        rocketTop3.x = app.screen.width/1.8;        
+        rocketTop3.y = app.screen.height /1.13;
+        rocketTop3.interactive = true;
+        rocketTop3.buttonMode =true;
+        bottom3.x = app.screen.width /1.8;
+        bottom3.y = app.screen.height/1.05;
+        thrust3.x = app.screen.width/1.77;
+        thrust3.y = app.screen.height / 1.02;
+        thrust3.visible = false;
+         ////Rocket 4 /////   
+        rocketTop4.x = app.screen.width/1.4;
+        rocketTop4.y = app.screen.height /1.13;
+        rocketTop4.interactive = true;
+        rocketTop4.buttonMode =true;
+        bottom4.x = app.screen.width /1.4;
+        bottom4.y = app.screen.height/1.05;
+        thrust4.x = app.screen.width/1.38;
+        thrust4.y = app.screen.height / 1.02;
+        thrust4.visible = false;
+}
+    $.getJSON( "https://api.spacexdata.com/v2/rockets", function(data) { 
+        var foo = data.property;
+        let fuel = [];
+        var rocket1_fuel = null;
+        var rocket1_fuel2  = null;
+        var rocket2_fuel1 = null;
+        var rocket2_fuel2 = null;
+        var rocket3_fuel1 = null;
+        var rocket3_fuel2 = null;
+        var rocket4_fuel1 = null;
+        var rocket4_fuel2; 
+        var fuelC = 1;
+        $.each( data, function( key, val ) {
+        fuel.push( key,val );
+        }) 
+        rocket1_fuel = fuel[1].first_stage.fuel_amount_tons;
+        rocket1_fuel2 = fuel[1].second_stage.fuel_amount_tons;
+        rocket2_fuel1 = fuel[3].first_stage.fuel_amount_tons;
+        rocket2_fuel2 = fuel[3].second_stage.fuel_amount_tons;
+        rocket3_fuel1 = fuel[5].first_stage.fuel_amount_tons;
+        rocket3_fuel2 = fuel[5].second_stage.fuel_amount_tons;
+        rocket4_fuel1 = fuel[7].first_stage.fuel_amount_tons;
+        rocket4_fuel2 = fuel[7].second_stage.fuel_amount_tons;
+        $("#btn").on ("click", function(){
+            $(setInterval(fuelLos, 1000));
+            $(gameLoop());
+        })
+    function gameLoop(){
+        requestAnimationFrame(gameLoop);
+        var speedO = 0.04;
+        var speedY = 0.02;
+        var speed = 0.01; 
+        var speedF = 0.004;
+        thrust1.visible = true;
+        thrust1.y -=speedO;
+        bottom1.y -= speedO;
+        rocketTop1.y -= speedO;
+        thrust2.visible = true;
+        thrust2.y -=speedY;
+        bottom2.y -= speedY;
+        rocketTop2.y -= speedY;
+        thrust3.visible = true;
+        thrust3.y -=speed;
+        bottom3.y -= speed;
+        rocketTop3.y -= speed;
+        thrust4.y -=speedF;
+        bottom4.y -= speedF;
+        rocketTop4.y -= speedF;
+        thrust4.visible = true;
+        if (rocket1_fuel <= 0){
+               rocket1_fuel = 0;
+               rocket1_fuel2 -= fuelC;
+               bottom1.visible = false; 
+            };
+        if (rocket1_fuel2 <= 0){
+                rocket1_fuel2 = 0;
+                rocketTop1.visible = false;  
+                thrust1.visible =false;
+           };
+        if (rocket2_fuel1 <= 0){
+            rocket2_fuel1 = 0;
+            rocket2_fuel2 -= fuelC;
+            bottom2.visible = false;
+        };
+        if (rocket2_fuel2 <= 0){
+            rocket2_fuel2 = 0;
+            rocketTop2.visible = false;
+            thrust2.visible = false;
+        };
+        if (rocket3_fuel1 < 0){
+            rocket3_fuel1 = 0;
+            rocket3_fuel2 -= fuelC;
+            bottom3.visible = false;
+        };
+        if (rocket3_fuel2 <= 0){
+            rocket3_fuel2 = 0;
+            rocketTop3.visible = false;
+            thrust3.visible = false;
+        };
+        if (rocket4_fuel1 < 0){
+            rocket4_fuel1 = 0;
+            rocket4_fuel2 -= fuelC;
+            bottom4.visible = false;
+        };
+        if (rocket4_fuel2 <= 0){
+            rocket4_fuel2 = 0;
+            rocketTop4.visible = false;
+            thrust4.visible = false;
+            alert("Success")
+        };
+    }
+        function fuelLos(){
+            rocket1_fuel  -= fuelC;
+            rocket2_fuel1 -= fuelC;
+            rocket3_fuel1 -= fuelC;
+            rocket4_fuel1 -= fuelC;
+            $("#fuel1").empty();
+            $("#fuel2").empty();
+            $("#fuel3").empty();
+            $("#fuel4").empty();
+            $("#fuel5").empty();
+            $("#fuel6").empty();
+            $("#fuel7").empty();
+            $("#fuel8").empty();
+            $("#fuel1").append(rocket1_fuel);
+            $("#fuel2").append(rocket1_fuel2);
+            $("#fuel3").append(rocket2_fuel1);
+            $("#fuel4").append(rocket2_fuel2);
+            $("#fuel5").append(rocket3_fuel1);
+            $("#fuel6").append(rocket3_fuel2);
+            $("#fuel7").append(rocket4_fuel1);
+            $("#fuel8").append(rocket4_fuel2);
+        }
+ 
+    })           
+</script>
+<style>
+    body{
+       background-image: url('./images/bg.jpg');
+       background-repeat: no-repeat;
+       background-size: cover;
+     }
+    #btn{
+        position: fixed;  
+        margin-top: 10%;
+        margin-left: 45%; 
+    }
+</style>
+</html>
